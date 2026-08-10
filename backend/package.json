@@ -1,0 +1,19 @@
+{
+  "name": "zobaroute-backend",
+  "version": "1.0.0",
+  "description": "Backend ZoBaRoute",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node --watch src/app.js"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "author": "Stefan Furrer",
+  "license": "UNLICENSED",
+  "type": "module",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
