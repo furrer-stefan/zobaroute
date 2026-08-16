@@ -22,9 +22,8 @@ CREATE TABLE orders (
     longitude NUMERIC(9,6),
     latitude NUMERIC(9,6),
     comment TEXT,
-    validation_import VARCHAR(20) NOT NULL CHECK (validation_import IN ('corrected', 'successful', 'failed')),
-    validation_geocoding VARCHAR(20) NOT NULL CHECK (validation_geocoding IN ('not_started', 'successful', 'failed')),
-    validation_error TEXT
+    geocoding_status VARCHAR(20) NOT NULL CHECK (geocoding_status IN ('not_started', 'successful', 'failed')),
+    geocoding_error TEXT
 );
 
 CREATE TABLE order_items (

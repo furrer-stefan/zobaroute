@@ -1,16 +1,16 @@
 import express from "express"
 import { getHealth } from "../controllers/healthController.js"
 import { deleteAllData } from "../controllers/dataController.js"
-import { importOrders, getAllOrders, updateOrder, startGeocoding } from "../controllers/importController.js"
+import { validateOrders, postAllOrders, getAllOrders, startGeocoding } from "../controllers/importController.js"
 import { startCalculation, getAllRoutes, getGpxFromRoute, getPdfFromRoute } from "../controllers/routeController.js"
 
 const router = express.Router()
 
 router.get("/health", getHealth)
 
-router.post("/import", importOrders)
+router.post("/orders/validate", validateOrders)
+router.post("/orders", postAllOrders)
 router.get("/orders", getAllOrders)
-router.put("/orders/:id", updateOrder)
 router.post("/geocode", startGeocoding)
 
 router.post("/routes/calculate", startCalculation)
