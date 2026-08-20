@@ -22,7 +22,7 @@ CREATE TABLE orders (
     longitude NUMERIC(9,6),
     latitude NUMERIC(9,6),
     comment TEXT,
-    geocoding_status VARCHAR(20) NOT NULL CHECK (geocoding_status IN ('not_started', 'successful', 'failed')),
+    geocoding_status VARCHAR(20) NOT NULL DEFAULT 'not_started' CHECK (geocoding_status IN ('not_started', 'successful', 'failed')),
     geocoding_error TEXT
 );
 
