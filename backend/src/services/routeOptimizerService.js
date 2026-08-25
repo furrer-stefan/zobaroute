@@ -149,3 +149,44 @@ function balanceClusterDistribution(clusters, stops, teamCount){
     }
     return clusters
 }
+
+function buildLinearDistanceMatrix(stops){
+    const matrix = []
+    for(let i = 0; i < stops.length; i++){
+        matrix[i] = []
+        for(let j = 0; j < stops.length; j++){
+            matrix[i][j] = calculateDistance(stops[i], stops[j])
+        }
+    }
+    return matrix
+}
+
+
+function orderStopsNearestNeighbor(stops, depot) {
+    const allAddresses = [depot, ...stops] // add the depot at the start of the stops
+    const matrix = buildLinearDistanceMatrix(allAddresses)
+    const route = []
+    const visited = new Set()
+    let currentIndex = 0
+    route.push(currentIndex)
+    visited.add(currentIndex)
+    while(visited.size < matrix.length){
+        let nearestDistance = Infinity
+        let nearestIndex = -1
+        const currentMatrixRow = matrix[currentIndex]
+        for(let j = 0; j < currentMatrixRow.length; j++){
+            if(visited.has(j)){
+                continue
+            }
+            const distance = currentMatrixRow[j]
+            if(distance < nearestDistance){
+                nearestDistance = distance
+                nearestIndex = j
+            }
+        }
+        route.push(nearestIndex)
+        visited.add(nearestIndex)
+        currentIndex = nearestIndex
+    }
+    return route
+}
