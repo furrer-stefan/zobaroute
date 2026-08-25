@@ -12,6 +12,7 @@
 
 const METERS_PER_DEGREE  = 111320
 const MAX_ROUNDS = 100
+const SIZE_TOLERANCE = 0.1
 
 function calculateDistance(a, b) {
     // calculate delta from both latitudes
@@ -86,6 +87,65 @@ function clusterStops(stops, teamCount) {
                 centroids[i] = newCentroid
             }
         }
+    }
+    return clusters
+}
+
+// phase 2 - balancing the different clusters, so that every cluster has more or less the same amount of stops
+// step 1: caluclating the size of one route with a variable tolerance (e.g. 10%)
+// step 2: as long as a cluster is to big, stops will be moved to another cluster
+// step 3: stop the automation, as soon as all clusters are in the accepted tolerance
+
+function balanceClusterDistribution(clusters, stops, teamCount){
+    const targetSize = stops.length / teamCount
+    const maxSize = Math.ceil(targetSize * (1 + SIZE_TOLERANCE)) // ceil rounds up
+
+    const maxShifts = stops.length * 2
+    for (let shift = 0; shift < maxShifts; shift++) {
+        let biggestSize = 0
+        let biggestIndex = -1;
+        for(let i = 0; i < clusters.length; i++){
+            if(clusters[i].length > biggestSize){
+                biggestSize = clusters[i].length
+                biggestIndex = i
+            }
+        }
+        if(biggestSize <= maxSize){
+            break
+        }
+        const biggestCluster = clusters[biggestIndex]
+        
+        const centroids = [] 
+        for (let i = 0; i < clusters.length; i++) {
+            const newCentroid = calculateCentroid(clusters[i])
+            if(newCentroid){
+                centroids[i] = newCentroid
+            }
+        }
+
+        let shortestDistance = Infinity
+        let bestStopIndex = null
+        let bestTargetClusterIndex = null
+        for(let i = 0; i < biggestCluster.length; i++){
+            for(let j = 0; j < clusters.length; j++){
+                if(j === biggestIndex || clusters[j].length >= maxSize){
+                    continue
+                }
+                const newCentroid = centroids[j]
+                const distance = calculateDistance(biggestCluster[i], newCentroid)
+                if(distance < shortestDistance){
+                    shortestDistance = distance
+                    bestStopIndex = i
+                    bestTargetClusterIndex = j
+                }
+            }
+        }
+        if (bestStopIndex === null) { // if all clusters are all maxSize
+            break
+        }
+        const stopToShift = biggestCluster.splice(bestStopIndex, 1)[0] // splice command --> takes the stop at position i and removes 1 element there, [0] in order to not get the array, just the value
+        clusters[bestTargetClusterIndex].push(stopToShift)
+        stopToShift.clusterIndex = bestTargetClusterIndex
     }
     return clusters
 }
