@@ -17,3 +17,8 @@ export async function getAllOrders(req, res) {
 export async function startGeocoding(req, res) {
     res.status(501).json({ message: "Not implemented yet" })
 }
+
+// POST /api/geocode/address
+export async function geocodeSingleAddress(req, res) {
+    res.status(501).json({ message: "Not implemented yet" })
+}

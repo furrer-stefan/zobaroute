@@ -30,3 +30,23 @@ export async function geocodeOrders(orders, onProgress) {
     }
     return combinedResults
 }
+
+export async function geocodeSingleAddress(address) {
+    const missingFields = []
+    const street = (address.street || "").trim() // if address.street is not valid, street will be set to ""
+    const postalCode = (address.postalCode || "").trim()
+    const city = (address.city || "").trim()
+    if(street === ""){
+        missingFields.push("Strasse")
+    }
+    if(postalCode === ""){
+        missingFields.push("PLZ")
+    }
+    if(city === ""){
+        missingFields.push("Ort")
+    }
+    if(missingFields.length > 0){
+        return { success: false, error: `Folgende Angaben fehlen in der Adresse: ${missingFields.join(", ")}`}
+    }
+    return await geocodeAddress({ street: street, postalCode: postalCode, city: city })
+}

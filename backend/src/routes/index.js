@@ -1,7 +1,7 @@
 import express from "express"
 import { getHealth } from "../controllers/healthController.js"
 import { deleteAllData } from "../controllers/dataController.js"
-import { validateOrders, postAllOrders, getAllOrders, startGeocoding } from "../controllers/importController.js"
+import { validateOrders, postAllOrders, getAllOrders, startGeocoding, geocodeSingleAddress } from "../controllers/importController.js"
 import { startCalculation, getAllRoutes, getGpxFromRoute, getPdfFromRoute } from "../controllers/routeController.js"
 
 const router = express.Router()
@@ -12,6 +12,7 @@ router.post("/orders/validate", validateOrders)
 router.post("/orders", postAllOrders)
 router.get("/orders", getAllOrders)
 router.post("/geocode", startGeocoding)
+router.post("/geocode/address", geocodeSingleAddress)
 
 router.post("/routes/calculate", startCalculation)
 router.get("/routes", getAllRoutes)
