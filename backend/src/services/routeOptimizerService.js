@@ -161,13 +161,10 @@ function buildLinearDistanceMatrix(stops){
     return matrix
 }
 
-
-function orderStopsNearestNeighbor(stops, depot) {
-    const allAddresses = [depot, ...stops] // add the depot at the start of the stops
-    const matrix = buildLinearDistanceMatrix(allAddresses)
+function orderStopsNearestNeighbor(matrix, startIndex) {
     const route = []
     const visited = new Set()
-    let currentIndex = 0
+    let currentIndex = startIndex
     route.push(currentIndex)
     visited.add(currentIndex)
     while(visited.size < matrix.length){
@@ -190,3 +187,43 @@ function orderStopsNearestNeighbor(stops, depot) {
     }
     return route
 }
+
+function calculateRouteLength(route, matrix) {    
+    let totalDistance = 0
+    for(let i = 0; i < route.length - 1; i++){
+        const distance = matrix[route[i]][route[i + 1]]
+        totalDistance += distance
+    }
+    return totalDistance
+}
+
+function improveRoute2opt(route, matrix) {
+    let improved = true
+    let shortestLength = calculateRouteLength(route, matrix)
+    let shortestRoute = route
+
+    while(improved){
+        improved = false
+        for (let i = 1; i < shortestRoute.length - 1 && !improved; i++) { // i = 1, weil das Depot nicht geprüft werden soll, das ist klar, dass es auf der Route am Anfang sein soll
+            for (let j = i + 1; j < shortestRoute.length; j++) {
+                const firstPart = shortestRoute.slice(0, i) // takes the first part, from 0 until the current value of for loop. in slice, the second value will be the first one, to not be included
+                const flipPart = shortestRoute.slice(i, j + 1).reverse() // takes the middle part and flips it
+                const lastPart = shortestRoute.slice(j + 1) // takes the last part
+                const newRoute = firstPart.concat(flipPart).concat(lastPart) // adds all of the parts back together
+                const newLength = calculateRouteLength(newRoute, matrix)
+                if(newLength < shortestLength){
+                    shortestLength = newLength
+                    shortestRoute = newRoute
+                    improved = true
+                    break
+                }
+            }
+        }
+    }
+    return shortestRoute
+}
+
+// später dann vor aufruf von orderStopsNearestNeigbor:
+// const allAddresses = [depot, ...stops] // add the depot at the start of the stops
+// const matrix = buildLinearDistanceMatrix(allAddresses)
+
