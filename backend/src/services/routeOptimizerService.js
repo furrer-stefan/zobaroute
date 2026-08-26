@@ -223,7 +223,32 @@ function improveRoute2opt(route, matrix) {
     return shortestRoute
 }
 
-// später dann vor aufruf von orderStopsNearestNeigbor:
-// const allAddresses = [depot, ...stops] // add the depot at the start of the stops
-// const matrix = buildLinearDistanceMatrix(allAddresses)
+export function calculateRoutes(orders, teamCount, depot) {
+    const clusters = clusterStops(orders, teamCount)
+    const balancedClusters = balanceClusterDistribution(clusters, orders, teamCount)
+    const optimizedRoutes = []
+    for(let i = 0; i < balancedClusters.length; i++){
+        const allPoints = [depot, ...balancedClusters[i]] // add the depot at the start of the stops
+        const matrix = buildLinearDistanceMatrix(allPoints)
+        const nearestNeighborRoute = orderStopsNearestNeighbor(matrix, 0)
+        const improvedRoute = improveRoute2opt(nearestNeighborRoute, matrix)
+        const improvedStops = []
+        for(let j = 1; j < improvedRoute.length; j++){ // j = 1, weil das Depot nicht mit dazu genommen werden soll
+            let distance = null
+            if(j > 1){
+                distance = matrix[improvedRoute[j - 1]][improvedRoute[j]]
+            }
+            improvedStops.push({
+                orderId: allPoints[improvedRoute[j]].orderId,
+                sequencePosition: j,
+                distance: distance
+            })
+        }
+        optimizedRoutes.push({
+            teamNumber: i + 1,
+            stops: improvedStops
+        })
+    }
+    return optimizedRoutes
+}
 
