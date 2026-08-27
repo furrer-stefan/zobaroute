@@ -1,3 +1,5 @@
+import { fetchDistanceMatrix } from "../adapters/routingAdapter.js"
+
 // phase 1 - clustering
 // all the coordination-points will be devided by the amount of teams, if they are spatially related and in the same areas
 // procedure: k means clustering
@@ -223,13 +225,22 @@ function improveRoute2opt(route, matrix) {
     return shortestRoute
 }
 
-export function calculateRoutes(orders, teamCount, depot) {
+export async function calculateRoutes(orders, teamCount, depot) {
     const clusters = clusterStops(orders, teamCount)
     const balancedClusters = balanceClusterDistribution(clusters, orders, teamCount)
     const optimizedRoutes = []
     for(let i = 0; i < balancedClusters.length; i++){
         const allPoints = [depot, ...balancedClusters[i]] // add the depot at the start of the stops
-        const matrix = buildLinearDistanceMatrix(allPoints)
+        
+        let matrix
+        const result = await fetchDistanceMatrix(allPoints)
+        if(result.success === true){
+            matrix = result.matrix
+        }else{
+            console.warn("ORS nicht verfügbar, Berechnung mit Luftlinie:", result.error)
+            matrix = buildLinearDistanceMatrix(allPoints)
+        }
+
         const nearestNeighborRoute = orderStopsNearestNeighbor(matrix, 0)
         const improvedRoute = improveRoute2opt(nearestNeighborRoute, matrix)
         const improvedStops = []
