@@ -251,4 +251,3 @@ export function calculateRoutes(orders, teamCount, depot) {
     }
     return optimizedRoutes
 }
-
