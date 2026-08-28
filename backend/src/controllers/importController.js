@@ -1,4 +1,4 @@
-import { getAllOrders, updateGeocodingResults } from "../repositories/orderRepository.js"
+import { getAllOrders, getOrdersForGeocoding, updateGeocodingResults } from "../repositories/orderRepository.js"
 import { validateOrders } from "../services/validationService.js"
 import { saveOrders } from "../repositories/orderRepository.js"
 import { parseExcelBuffer } from "../services/excelParserService.js"

@@ -1,6 +1,6 @@
-import { getAllOrders } from "../repositories/orderRepository"
-import { getAllRoutes, saveRoutes } from "../repositories/routeRepository"
-import { calculateRoutes } from "../services/routeOptimizerService"
+import { getAllOrders } from "../repositories/orderRepository.js"
+import { getAllRoutes, saveRoutes } from "../repositories/routeRepository.js"
+import { calculateRoutes } from "../services/routeOptimizerService.js"
 
 // POST /api/routes/calculate
 export async function startCalculation(req, res) {
