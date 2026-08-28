@@ -1,8 +1,8 @@
 import express from "express"
 import { getHealth } from "../controllers/healthController.js"
 import { deleteSession } from "../controllers/dataController.js"
-import { validateOrdersFile, postOrders, getOrders, startGeocoding, geocodeSingleAddress } from "../controllers/importController.js"
-import { startCalculation, getAllRoutes, getGpxFromRoute, getPdfFromRoute } from "../controllers/routeController.js"
+import { validateOrdersFile, postOrders, getOrders, startGeocoding, geocodeSingle } from "../controllers/importController.js"
+import { startCalculation, getRoutes, getGpxFromRoute, getPdfFromRoute } from "../controllers/routeController.js"
 import multer from "multer"
 
 const router = express.Router()
@@ -18,10 +18,10 @@ router.post("/orders/validate", upload.single("file"), validateOrdersFile)
 router.post("/orders", postOrders)
 router.get("/orders", getOrders)
 router.post("/geocode", startGeocoding)
-router.post("/geocode/address", geocodeSingleAddress)
+router.post("/geocode/address", geocodeSingle)
 
 router.post("/routes/calculate", startCalculation)
-router.get("/routes", getAllRoutes)
+router.get("/routes", getRoutes)
 router.get("/routes/:id/gpx", getGpxFromRoute)
 router.get("/routes/:id/pdf", getPdfFromRoute)
 

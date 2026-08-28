@@ -1,7 +1,8 @@
-import { getAllOrders } from "../repositories/orderRepository.js"
+import { getAllOrders, updateGeocodingResults } from "../repositories/orderRepository.js"
 import { validateOrders } from "../services/validationService.js"
 import { saveOrders } from "../repositories/orderRepository.js"
 import { parseExcelBuffer } from "../services/excelParserService.js"
+import { geocodeOrders, geocodeSingleAddress } from "../services/geocodingService.js"
 
 // POST /api/orders/validate
 export async function validateOrdersFile(req, res) {
@@ -52,10 +53,37 @@ export async function getOrders(req, res) {
 
 // POST /api/geocode
 export async function startGeocoding(req, res) {
-    res.status(501).json({ message: "Not implemented yet" })
+    try{
+        const orders = await getOrdersForGeocoding()
+        if(orders.length === 0){
+            return res.status(200).json({ message: "Keine Berechnung nötig, alle Adressen sind bereits berechnet" })
+        }
+        const geocoded = await geocodeOrders(orders)
+        await updateGeocodingResults(geocoded)
+        const successful = geocoded.filter(function (o) { return o.geocodingStatus === "successful" })
+        const failed = geocoded.filter(function (o) { return o.geocodingStatus === "failed" })
+        return res.status(200).json({ total: geocoded.length, successful: successful.length, failed: failed.length})
+    }catch(error){
+        console.error("Fehler beim Geokodieren:", error)
+        res.status(500).json({ message: "Die Geokodierung konnte nicht durchgeführt werden" })
+    }
 }
 
 // POST /api/geocode/address
-export async function geocodeSingleAddress(req, res) {
-    res.status(501).json({ message: "Not implemented yet" })
+export async function geocodeSingle(req, res) {
+    const address = req.body
+    try{
+        const result = await geocodeSingleAddress(address)
+        if(result.success === true){
+            return res.status(200).json({ latitude: result.latitude, longitude: result.longitude })
+        }
+        if(result.technicalFailure === true){
+            return res.status(503).json({ message: result.error })
+        }
+        return res.status(404).json({ message: result.error })
+            
+    }catch(error){
+        console.error("Fehler beim Verarbeiten:", error)
+        res.status(500).json({ message: "Die Adresse konnte nicht verarbeitet werden" })
+    }
 }
