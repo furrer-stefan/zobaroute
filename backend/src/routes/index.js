@@ -1,16 +1,22 @@
 import express from "express"
 import { getHealth } from "../controllers/healthController.js"
-import { deleteAllData } from "../controllers/dataController.js"
-import { validateOrders, postAllOrders, getAllOrders, startGeocoding, geocodeSingleAddress } from "../controllers/importController.js"
+import { deleteSession } from "../controllers/dataController.js"
+import { validateOrdersFile, postOrders, getOrders, startGeocoding, geocodeSingleAddress } from "../controllers/importController.js"
 import { startCalculation, getAllRoutes, getGpxFromRoute, getPdfFromRoute } from "../controllers/routeController.js"
+import multer from "multer"
 
 const router = express.Router()
 
+const upload = multer({
+    storage: multer.memoryStorage(), // keeps the file in memory, not local storage
+    limits: { fileSize: 5 * 1024 * 1024 } // limit of 5 MB
+})
+
 router.get("/health", getHealth)
 
-router.post("/orders/validate", validateOrders)
-router.post("/orders", postAllOrders)
-router.get("/orders", getAllOrders)
+router.post("/orders/validate", upload.single("file"), validateOrdersFile)
+router.post("/orders", postOrders)
+router.get("/orders", getOrders)
 router.post("/geocode", startGeocoding)
 router.post("/geocode/address", geocodeSingleAddress)
 
@@ -19,6 +25,6 @@ router.get("/routes", getAllRoutes)
 router.get("/routes/:id/gpx", getGpxFromRoute)
 router.get("/routes/:id/pdf", getPdfFromRoute)
 
-router.delete("/session", deleteAllData)
+router.delete("/session", deleteSession)
 
 export default router
