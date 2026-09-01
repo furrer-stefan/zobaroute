@@ -61,6 +61,7 @@ export async function getAllRoutes() {
             size,
             quantity
         FROM order_items
+        ORDER BY size
     `)
     const items = itemsResult.rows
 
@@ -128,7 +129,8 @@ export async function getRouteById(routeId) {
             i.quantity
         FROM order_items i
         JOIN stops s ON s.order_id = i.order_id
-        WHERE s.route_id = $1`,
+        WHERE s.route_id = $1
+        ORDER BY i.size`,
         [routeId]
     )
     const items = itemsResult.rows
