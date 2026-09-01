@@ -1,4 +1,5 @@
 import { buildGpx } from "../exporters/gpxExporter.js"
+import { buildPdf } from "../exporters/pdfExporter.js"
 import { getAllOrders } from "../repositories/orderRepository.js"
 import { getAllRoutes, getRouteById, saveRoutes } from "../repositories/routeRepository.js"
 import { calculateRoutes } from "../services/routeOptimizerService.js"
@@ -85,5 +86,21 @@ export async function getGpxFromRoute(req, res) {
 
 // GET /api/routes/:id/pdf
 export async function getPdfFromRoute(req, res) {
-    res.status(501).json({ message: "Not implemented yet" })
+    const routeId = Number(req.params.id)
+    if(!Number.isInteger(routeId) || routeId < 1){
+        return res.status(400).json({ message: `Die ID der Route ist keine gültige Zahl: '${routeId}'` })
+    }
+    try{
+        const route = await getRouteById(routeId)
+        if (!route) {
+            return res.status(404).json({ message: "Die Route wurde nicht gefunden" })
+        }
+        const pdfContent = await buildPdf(route)
+        res.setHeader("Content-Type", "application/pdf")
+        res.setHeader("Content-Disposition", `attachment; filename="team-${route.teamNumber}.pdf"`)
+        res.send(pdfContent)
+    }catch(error){
+        console.error("Fehler beim Erstellen der PDF Datei:", error)
+        return res.status(500).json({ message: "Die PDF Datei konnte nicht erstellt werden" })
+    }
 }
