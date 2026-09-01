@@ -1,5 +1,6 @@
+import { buildGpx } from "../exporters/gpxExporter.js"
 import { getAllOrders } from "../repositories/orderRepository.js"
-import { getAllRoutes, saveRoutes } from "../repositories/routeRepository.js"
+import { getAllRoutes, getRouteById, saveRoutes } from "../repositories/routeRepository.js"
 import { calculateRoutes } from "../services/routeOptimizerService.js"
 
 // POST /api/routes/calculate
@@ -63,7 +64,23 @@ export async function getRoutes(req, res) {
 
 // GET /api/routes/:id/gpx
 export async function getGpxFromRoute(req, res) {
-    res.status(501).json({ message: "Not implemented yet" })
+    const routeId = Number(req.params.id)
+    if(!Number.isInteger(routeId) || routeId < 1){
+        return res.status(400).json({ message: `Die ID der Route ist keine gültige Zahl: '${routeId}'` })
+    }
+    try{
+        const route = await getRouteById(routeId)
+        if (!route) {
+            return res.status(404).json({ message: "Die Route wurde nicht gefunden" })
+        }
+        const gpxContent = buildGpx(route)
+        res.setHeader("Content-Type", "application/gpx+xml")
+        res.setHeader("Content-Disposition", `attachment; filename="team-${route.teamNumber}.gpx"`)
+        res.send(gpxContent)
+    }catch(error){
+        console.error("Fehler beim Erstellen der GPX Datei:", error)
+        return res.status(500).json({ message: "Die GPX Datei konnte nicht erstellt werden" })
+    }
 }
 
 // GET /api/routes/:id/pdf
