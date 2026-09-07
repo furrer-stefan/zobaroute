@@ -19,7 +19,7 @@ function toText(value) {
     if(value === null || value === undefined){
         return ""
     }
-    return String(value).trim()
+    return String(value).replace(/\r\n|\r|\n/g, " ").replace(/\s+/g, " ").trim()
 }
 
 function toQuantity(value) {
