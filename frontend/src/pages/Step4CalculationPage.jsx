@@ -19,6 +19,7 @@ function Step4CalculationPage({ config, setRoutes, routes, next }) {
     const [error, setError] = useState(null)
     const [isCalculating, setIsCalculating] = useState(false)
     useEffect(function () {
+        setRoutes(null)
         startGeocoding()
         const timer = setInterval(async function () {
             try{
