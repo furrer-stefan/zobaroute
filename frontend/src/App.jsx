@@ -1,6 +1,7 @@
 import { useWizard } from "./hooks/useWizard.js"
-import Step1ImportPage from "./pages/Step1ImportPage.jsx"
 import { useState } from "react"
+import Step1ImportPage from "./pages/Step1ImportPage.jsx"
+import Step2ValidationPage from "./pages/Step2ValidationPage.jsx"
 
 const STEP_NAMES = ["Import", "Validierung", "Konfiguration", "Berechnung", "Export"]
 
@@ -21,12 +22,11 @@ function App() {
         return <span key={index} className={className}>{name}</span>
       })}
       {step === 1 && <Step1ImportPage setOrders={setOrders} next={next} />}
-      {step === 2 && <p>Hier kommt die Validierung und Bearbeitungsmodus</p>}
+      {step === 2 && <Step2ValidationPage orders = {orders} setOrders={setOrders} next={next} />}
       {step === 3 && <p>Hier kommt die Konfiguration</p>}
       {step === 4 && <p>Hier kommt die Routenberechnung</p>}
       {step === 5 && <p>Hier kommt der Export</p>}
       <button onClick={back}>Zurück</button>
-      <button onClick={next}>Vor</button>
     </div>
   )
 }
