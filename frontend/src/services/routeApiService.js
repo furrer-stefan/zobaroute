@@ -20,6 +20,11 @@ export function startGeocoding() {
     return post("/api/geocode", {})
 }
 
+// GET /api/geocode/progress
+export function getGeocodingProgress() {
+    return get("/api/geocode/progress")
+}
+
 // POST /api/geocode/address
 export function geocodeSingle(address) {
     return post("/api/geocode/address", address)

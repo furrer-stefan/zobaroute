@@ -3,6 +3,7 @@ import { useState } from "react"
 import Step1ImportPage from "./pages/Step1ImportPage.jsx"
 import Step2ValidationPage from "./pages/Step2ValidationPage.jsx"
 import Step3ConfigurationPage from "./pages/Step3ConfigurationPage.jsx"
+import Step4CalculationPage from "./pages/Step4CalculationPage.jsx"
 
 const STEP_NAMES = ["Import", "Validierung", "Konfiguration", "Berechnung", "Export"]
 
@@ -25,7 +26,7 @@ function App() {
       {step === 1 && <Step1ImportPage setOrders={setOrders} next={next} />}
       {step === 2 && <Step2ValidationPage orders = {orders} setOrders={setOrders} next={next} />}
       {step === 3 && <Step3ConfigurationPage setConfig={setConfig} next={next} />}
-      {step === 4 && <p>Hier kommt die Routenberechnung</p>}
+      {step === 4 && <Step4CalculationPage config={config} setRoutes={setRoutes} routes={routes} next={next} />}
       {step === 5 && <p>Hier kommt der Export</p>}
       <button onClick={back}>Zurück</button>
     </div>
