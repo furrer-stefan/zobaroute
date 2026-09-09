@@ -4,6 +4,13 @@ import { saveOrders } from "../repositories/orderRepository.js"
 import { parseExcelBuffer } from "../services/excelParserService.js"
 import { geocodeOrders, geocodeSingleAddress } from "../services/geocodingService.js"
 
+const geocodingProgress = {
+    running: false,
+    done: 0,
+    total: 0,
+    error: null
+}
+
 // POST /api/orders/validate
 export async function validateOrdersFile(req, res) {
     if(!req.file){
@@ -51,22 +58,47 @@ export async function getOrders(req, res) {
     }
 }
 
-// POST /api/geocode
-export async function startGeocoding(req, res) {
+// GET /api/geocode/progress
+export function getGeocodingProgress(req, res) {
+    res.json(geocodingProgress)
+}
+
+async function runGeocoding(orders ){
     try{
-        const orders = await getOrdersForGeocoding()
-        if(orders.length === 0){
-            return res.status(200).json({ message: "Keine Berechnung nötig, alle Adressen sind bereits berechnet" })
-        }
-        const geocoded = await geocodeOrders(orders)
+        const geocoded = await geocodeOrders(orders, function (done, total) {
+            geocodingProgress.done = done
+            geocodingProgress.total = total
+        })
         await updateGeocodingResults(geocoded)
-        const successful = geocoded.filter(function (o) { return o.geocodingStatus === "successful" })
-        const failed = geocoded.filter(function (o) { return o.geocodingStatus === "failed" })
-        return res.status(200).json({ total: geocoded.length, successful: successful.length, failed: failed.length})
     }catch(error){
         console.error("Fehler beim Geokodieren:", error)
-        res.status(500).json({ message: "Die Geokodierung konnte nicht durchgeführt werden" })
+        geocodingProgress.error = "Die Geokodierung konnte nicht abgeschlossen werden"
+    }finally{
+        geocodingProgress.running = false
     }
+}
+
+// POST /api/geocode
+export async function startGeocoding(req, res) {
+    if(geocodingProgress.running){
+        return res.status(409).json({ message: "Die Geokodierung läuft bereits" })
+    }
+    let orders
+    try{
+        orders = await getOrdersForGeocoding()
+    }catch(error){
+        console.error("Fehler beim Geokodieren:", error)
+        return res.status(500).json({ message: "Die Geokodierung konnte nicht durchgeführt werden" })
+    }
+    if(orders.length === 0){
+        return res.status(200).json({ message: "Keine Berechnung nötig, alle Adressen sind bereits berechnet" })
+    }
+    geocodingProgress.running = true
+    geocodingProgress.done = 0
+    geocodingProgress.total = orders.length
+    geocodingProgress.error = null
+    runGeocoding(orders)
+    res.status(202).json({ message: "Geokodierung gestartet", total: orders.length })
 }
 
 // POST /api/geocode/address

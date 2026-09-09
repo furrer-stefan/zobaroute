@@ -1,7 +1,7 @@
 import express from "express"
 import { getHealth } from "../controllers/healthController.js"
 import { deleteSession } from "../controllers/dataController.js"
-import { validateOrdersFile, postOrders, getOrders, startGeocoding, geocodeSingle } from "../controllers/importController.js"
+import { validateOrdersFile, postOrders, getOrders, startGeocoding, getGeocodingProgress, geocodeSingle } from "../controllers/importController.js"
 import { startCalculation, getRoutes, getGpxFromRoute, getPdfFromRoute } from "../controllers/routeController.js"
 import multer from "multer"
 
@@ -18,6 +18,7 @@ router.post("/orders/validate", upload.single("file"), validateOrdersFile)
 router.post("/orders", postOrders)
 router.get("/orders", getOrders)
 router.post("/geocode", startGeocoding)
+router.get("/geocode/progress", getGeocodingProgress)
 router.post("/geocode/address", geocodeSingle)
 
 router.post("/routes/calculate", startCalculation)
