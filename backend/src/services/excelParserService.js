@@ -31,7 +31,11 @@ function toQuantity(value) {
 
 export async function parseExcelBuffer(buffer) {
     const workbook = new ExcelJS.Workbook()
-    await workbook.xlsx.load(buffer)
+    try{
+        await workbook.xlsx.load(buffer)
+    }catch{
+        throw new Error("Die Datei konnte nicht gelesen werden. Es wird eine Excel-Datei im Format .xlsx erwartet.")
+    }
     const worksheet = workbook.worksheets[0]
     if(!worksheet){
         throw new Error("Die Datei enthält kein Arbeitsblatt")
