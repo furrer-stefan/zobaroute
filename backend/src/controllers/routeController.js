@@ -45,7 +45,8 @@ export async function startCalculation(req, res) {
 
         const routes = await calculateRoutes(geocoded, teamCount, depot)
         await saveRoutes(routes)
-        return res.status(200).json({ routes: routes })
+        const fullRoutes = await getAllRoutes()
+        return res.status(200).json({ routes: fullRoutes })
     }catch(error){
         console.error("Fehler beim Berechnen:", error)
         res.status(500).json({ message: "Die Berechnung konnte nicht durchgeführt werden" })
