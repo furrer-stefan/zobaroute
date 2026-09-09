@@ -9,7 +9,7 @@ function Step3ConfigurationPage({ setConfig, next }) {
     const [postalCode, setPostalCode] = useState("")
     const [city, setCity] = useState("")
     async function handleConfiguration() {
-        const teamCountNumber = Number(teamCount);
+        const teamCountNumber = Number(teamCount)
         if(!Number.isInteger(teamCountNumber) || teamCountNumber < 1){
             setError(`Die Menge für Teamanzahl ist keine gültige Zahl: '${teamCount}'`)
             return
