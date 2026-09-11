@@ -17,13 +17,15 @@ function App() {
   return(
     <div>
       <h1>ZoBaRoute</h1>
-      {STEP_NAMES.map(function (name, index) {
-        let className = "step";
-        if (index + 1 === step) {
-          className = "step-active";
-        }
-        return <span key={index} className={className}>{name}</span>
-      })}
+      <div className="steps">
+        {STEP_NAMES.map(function (name, index) {
+          let className = "step";
+          if (index + 1 === step) {
+            className = "step-active";
+          }
+          return <span key={index} className={className}>{name}</span>
+        })}
+      </div>
       {step === 1 && <Step1ImportPage setOrders={setOrders} next={next} />}
       {step === 2 && <Step2ValidationPage orders = {orders} setOrders={setOrders} next={next} />}
       {step === 3 && <Step3ConfigurationPage setConfig={setConfig} next={next} />}
