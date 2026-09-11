@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import { useState } from "react"
-import { getGeocodingProgress, startCalculation, startGeocoding } from "../services/routeApiService"
+import { getGeocodingProgress, startCalculation, startGeocoding, getOrders } from "../services/routeApiService"
 
 function getTotalsBySize(route) {
     const totals = { 300: 0, 500: 0, 700: 0 }
@@ -18,6 +18,7 @@ function Step4CalculationPage({ config, setRoutes, routes, next }) {
     const [progress, setProgress] = useState(null)
     const [error, setError] = useState(null)
     const [isCalculating, setIsCalculating] = useState(false)
+    const [failedOrders, setFailedOrders] = useState([])
     useEffect(function () {
         setRoutes(null)
         startGeocoding()
@@ -35,6 +36,11 @@ function Step4CalculationPage({ config, setRoutes, routes, next }) {
                 setIsCalculating(true)
                 const calcResult = await startCalculation(config.teamCount, config.depot)
                 setRoutes(calcResult.routes)
+                const ordersResult = await getOrders()
+                const failed = ordersResult.orders.filter(function (o) {
+                    return o.geocodingStatus === "failed"
+                })
+                setFailedOrders(failed)
                 setIsCalculating(false)
             }
             }catch(error){
@@ -63,10 +69,27 @@ function Step4CalculationPage({ config, setRoutes, routes, next }) {
 
         }
     }
+    const failedRows = []
+    for(const order of failedOrders){
+        failedRows.push(<li key={order.orderId}>
+            {order.firstName} {order.lastName}, {order.street}, {order.postalCode} {order.city} — {order.geocodingError}
+        </li>)
+    }
+    let failedOrdersMessage
+    if(failedOrders.length === 1){
+        failedOrdersMessage = "Eine Adresse konnte nicht verarbeitet werden und ist in keiner Route enthalten:"
+    }else if(failedOrders.length > 1){
+        failedOrdersMessage = `${failedOrders.length} Adressen konnten nicht verarbeitet werden und sind in keiner Route enthalten:`
+    }
+    
     return(
         <div>
             {progress && <p>{progress.done} von {progress.total} Adressen verarbeitet</p>}
             {isCalculating && <p>Optimale Routen werden berechnet...</p>}
+            {failedOrders.length > 0 && <div className="warning">
+                <p>{failedOrdersMessage}</p>
+                <ul>{failedRows}</ul>
+            </div>}
             {error && <p className="error">{error}</p>}
             {routes && <table>
                 <thead>
