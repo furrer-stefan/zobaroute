@@ -32,6 +32,7 @@ function Step5ExportPage({ routes, goTo, setOrders, setConfig, setRoutes }) {
     return(
         <div>
             <p className="intro">Lade für jedes Verteil-Team die Stoppliste als PDF und die Route als GPX-Datei herunter. Danach kannst du die Daten wieder löschen oder eine neue Berechnung starten.</p>
+            {error && <p className="error">{error}</p>}
             <table>
                 <thead>
                     <tr>
@@ -43,7 +44,6 @@ function Step5ExportPage({ routes, goTo, setOrders, setConfig, setRoutes }) {
                 </thead>
                 <tbody>{rows}</tbody>
             </table>
-            {error && <p className="error">{error}</p>}
             <button onClick={handleDelete}>Alle Daten löschen</button>
             <button onClick={function () { goTo(1) }}>Zurück zum Start</button>
         </div>

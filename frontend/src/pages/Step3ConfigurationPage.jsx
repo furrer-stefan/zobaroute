@@ -31,6 +31,8 @@ function Step3ConfigurationPage({ setConfig, next }) {
     return(
         <div>
             <p className="intro">Gebe an auf wie viele Verteil-Teams die Bestellungen aufgeteilt werden sollen. Das dient als Ausgangslage für die Anzahl Routen, die im nächsten Schritt berechnet werden. Zusätzlich wird die Verteil-Zentrale benötigt, also der Ausgangspunkt woher die Verteil-Teams ihre Route starten. Sie erscheint in den finalen Exportdateien nicht, dient aber der optimalen Routensuche.</p>
+            {error && <p className="error">{error}</p>}
+            {isLoading && <p>Daten werden validiert...</p>}
             <label>Anzahl Verteil-Teams</label>
             <input
                 type="number"
@@ -54,8 +56,6 @@ function Step3ConfigurationPage({ setConfig, next }) {
                 onChange={function (event) { setCity(event.target.value) }}
             />
             <button onClick={handleConfiguration} disabled={isLoading}>Bestätigen</button>
-            {isLoading && <p>Daten werden validiert...</p>}
-            {error && <p className="error">{error}</p>}
         </div>
     )
 }
