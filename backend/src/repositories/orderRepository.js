@@ -42,6 +42,7 @@ export async function saveOrders(orders) {
     const dbConnection = await pool.connect()
     try{
         await dbConnection.query("BEGIN")
+        await dbConnection.query("DELETE FROM orders")
         for(const order of orders){
             const orderResult = await dbConnection.query(
                 `INSERT INTO orders (first_name, last_name, street, postal_code, city, comment) VALUES ($1, $2, $3, $4, $5, $6) RETURNING order_id`,
