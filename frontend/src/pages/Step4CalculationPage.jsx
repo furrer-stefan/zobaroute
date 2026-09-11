@@ -72,7 +72,7 @@ function Step4CalculationPage({ config, setRoutes, routes, next }) {
     const failedRows = []
     for(const order of failedOrders){
         failedRows.push(<li key={order.orderId}>
-            {order.firstName} {order.lastName}, {order.street}, {order.postalCode} {order.city} — {order.geocodingError}
+            {order.firstName} {order.lastName}, {order.street}, {order.postalCode} {order.city} - {order.geocodingError}
         </li>)
     }
     let failedOrdersMessage
@@ -86,12 +86,12 @@ function Step4CalculationPage({ config, setRoutes, routes, next }) {
         <div>
             <p className="intro">Die Adressen werden in Koordinaten umgewandelt und anschliessend auf die konfigurierte Anzahl Verteil-Teams aufgeteilt. Dieser Vorgang kann bei vielen Bestellungen einige Minuten dauern. Adressen, die nicht gefunden werden können, werden ausgewiesen und sind in keiner Route enthalten.</p>
             {error && <p className="error">{error}</p>}
+            {progress && <p>{progress.done} von {progress.total} Adressen verarbeitet</p>}
+            {isCalculating && <p>Optimale Routen werden berechnet...</p>}
             {failedOrders.length > 0 && <div className="warning">
                 <p>{failedOrdersMessage}</p>
                 <ul>{failedRows}</ul>
             </div>}
-            {progress && <p>{progress.done} von {progress.total} Adressen verarbeitet</p>}
-            {isCalculating && <p>Optimale Routen werden berechnet...</p>}
             {routes && <table>
                 <thead>
                     <tr>
