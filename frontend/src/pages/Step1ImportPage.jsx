@@ -22,6 +22,7 @@ function Step1ImportPage({ setOrders, next }) {
     }
     return(
         <div>
+            <p className="intro">Lade eine Excel-Datei mit allen Bestellungen hoch. Die erste Zeile muss exakt die folgenden Spaltentitel enthalten: Vorname, Nachname, Strasse, PLZ, Ort, Anzahl 300g, Anzahl 500g, Anzahl 700g, Bemerkung. Die Adressdaten müssen in den darunterliegenden Zeilen enthalten sein.</p>
             <input type="file" accept=".xlsx" onChange={handleUpload} disabled={isLoading} />
             {isLoading && <p>Datei wird verarbeitet...</p>}
             {error && <p className="error">{error}</p>}

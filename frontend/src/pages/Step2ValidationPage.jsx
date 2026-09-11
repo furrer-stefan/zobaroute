@@ -174,6 +174,7 @@ function Step2ValidationPage({ orders, setOrders, next }) {
     }
     return(
         <div>
+            <p className="intro">Prüfe die eingelesenen Bestellungen. Fehlerhafte Zeilen sind farblich markiert und in der Spalte «Fehler» beschrieben. Korrigieren zuerst die Angaben direkt in der Tabelle oder lösche einzelne Zeilen. Erst wenn keine Fehler mehr vorliegen, können die Bestellungen gespeichert werden.</p>
             <table>
                 <thead>
                     <tr>

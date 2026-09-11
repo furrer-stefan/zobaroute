@@ -31,6 +31,7 @@ function Step5ExportPage({ routes, goTo, setOrders, setConfig, setRoutes }) {
     }
     return(
         <div>
+            <p className="intro">Lade für jedes Verteil-Team die Stoppliste als PDF und die Route als GPX-Datei herunter. Danach kannst du die Daten wieder löschen oder eine neue Berechnung starten.</p>
             <table>
                 <thead>
                     <tr>

@@ -30,6 +30,7 @@ function Step3ConfigurationPage({ setConfig, next }) {
     }
     return(
         <div>
+            <p className="intro">Gebe an auf wie viele Verteil-Teams die Bestellungen aufgeteilt werden sollen. Das dient als Ausgangslage für die Anzahl Routen, die im nächsten Schritt berechnet werden. Zusätzlich wird die Verteil-Zentrale benötigt, also der Ausgangspunkt woher die Verteil-Teams ihre Route starten. Sie erscheint in den finalen Exportdateien nicht, dient aber der optimalen Routensuche.</p>
             <label>Anzahl Verteil-Teams</label>
             <input
                 type="number"
