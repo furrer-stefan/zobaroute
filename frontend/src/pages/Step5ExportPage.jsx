@@ -24,8 +24,8 @@ function Step5ExportPage({ routes, goTo, setOrders, setConfig, setRoutes }) {
             rows.push(<tr key={route.teamNumber}>
                 <td>{route.teamNumber}</td>
                 <td>{route.stops.length}</td>
-                <td><a href={`/api/routes/${route.routeId}/pdf`}>PDF Team {route.teamNumber}</a></td>
-                <td><a href={`/api/routes/${route.routeId}/gpx`}>GPX Team {route.teamNumber}</a></td>
+                <td><a href={`/api/routes/${route.routeId}/pdf`}>PDF</a></td>
+                <td><a href={`/api/routes/${route.routeId}/gpx`}>GPX</a></td>
             </tr>)
         }
     }
