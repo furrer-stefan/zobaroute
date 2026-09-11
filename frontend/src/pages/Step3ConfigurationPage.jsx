@@ -4,7 +4,7 @@ import { geocodeSingle } from "../services/routeApiService"
 function Step3ConfigurationPage({ setConfig, next }) {
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState(null)
-    const [teamCount, setTeamCount] = useState(10)
+    const [teamCount, setTeamCount] = useState("")
     const [street, setStreet] = useState("")
     const [postalCode, setPostalCode] = useState("")
     const [city, setCity] = useState("")
@@ -32,29 +32,37 @@ function Step3ConfigurationPage({ setConfig, next }) {
         <div>
             <p className="intro">Gebe an auf wie viele Verteil-Teams die Bestellungen aufgeteilt werden sollen. Das dient als Ausgangslage für die Anzahl Routen, die im nächsten Schritt berechnet werden. Zusätzlich wird die Verteil-Zentrale benötigt, also der Ausgangspunkt woher die Verteil-Teams ihre Route starten. Sie erscheint in den finalen Exportdateien nicht, dient aber der optimalen Routensuche.</p>
             {error && <p className="error">{error}</p>}
-            {isLoading && <p>Daten werden validiert...</p>}
-            <label>Anzahl Verteil-Teams</label>
-            <input
-                type="number"
-                value={teamCount}
-                onChange={function (event) { setTeamCount(event.target.value) }}
-            />
-            <p>Verteil-Zentrale</p>
-            <label>Strasse</label>
-            <input
-                value={street}
-                onChange={function (event) { setStreet(event.target.value) }}
-            />
-            <label>PLZ</label>
-            <input
-                value={postalCode}
-                onChange={function (event) { setPostalCode(event.target.value) }}
-            />
-            <label>Ort</label>
-            <input
-                value={city}
-                onChange={function (event) { setCity(event.target.value) }}
-            />
+            {isLoading && <p className="status">Daten werden validiert...</p>}
+            <div className="form-row">
+                <label>Anzahl Verteil-Teams</label>
+                <input
+                    type="number"
+                    value={teamCount}
+                    onChange={function (event) { setTeamCount(event.target.value) }}
+                />
+            </div>
+            <h3>Verteil-Zentrale</h3>
+            <div className="form-row">
+                <label>Strasse</label>
+                <input
+                    value={street}
+                    onChange={function (event) { setStreet(event.target.value) }}
+                />
+            </div>
+            <div className="form-row">
+                <label>PLZ</label>
+                <input
+                    value={postalCode}
+                    onChange={function (event) { setPostalCode(event.target.value) }}
+                />
+            </div>
+            <div className="form-row">
+                <label>Ort</label>
+                <input
+                    value={city}
+                    onChange={function (event) { setCity(event.target.value) }}
+                />
+            </div>
             <button onClick={handleConfiguration} disabled={isLoading}>Bestätigen</button>
         </div>
     )

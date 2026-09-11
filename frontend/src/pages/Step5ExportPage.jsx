@@ -5,7 +5,7 @@ function Step5ExportPage({ routes, goTo, setOrders, setConfig, setRoutes }) {
     const [error, setError] = useState(null)
     const rows = []
     async function handleDelete() {
-        const confirmed = window.confirm("Alle Bestellungen und Routen werden gelöscht. Fortfahren?")
+        const confirmed = window.confirm("Alle Bestellungen und Routen werden gelöscht und der Vorgang wird beendet. Wurden alle benötigten Dateien heruntergeladen?")
         if (!confirmed) {
             return
         }
@@ -24,8 +24,8 @@ function Step5ExportPage({ routes, goTo, setOrders, setConfig, setRoutes }) {
             rows.push(<tr key={route.teamNumber}>
                 <td>{route.teamNumber}</td>
                 <td>{route.stops.length}</td>
-                <td><a href={`/api/routes/${route.routeId}/pdf`}>PDF</a></td>
-                <td><a href={`/api/routes/${route.routeId}/gpx`}>GPX</a></td>
+                <td><a href={`/api/routes/${route.routeId}/pdf`}>⬇ PDF</a></td>
+                <td><a href={`/api/routes/${route.routeId}/gpx`}>⬇ GPX</a></td>
             </tr>)
         }
     }
@@ -38,14 +38,13 @@ function Step5ExportPage({ routes, goTo, setOrders, setConfig, setRoutes }) {
                     <tr>
                         <th>Team</th>
                         <th>Stopps</th>
-                        <th></th>
-                        <th></th>
+                        <th>PDF</th>
+                        <th>GPX</th>
                     </tr>
                 </thead>
                 <tbody>{rows}</tbody>
             </table>
-            <button onClick={handleDelete}>Alle Daten löschen</button>
-            <button onClick={function () { goTo(1) }}>Zurück zum Start</button>
+            <button onClick={handleDelete}>Vorgang abschliessen und Daten löschen</button>
         </div>
     )
 }
