@@ -1,3 +1,5 @@
+import { logError } from "../utils/logger.js"
+
 export async function fetchDistanceMatrix(points) {
     const apiKey = process.env.ORS_API_KEY
     if (!apiKey) {
@@ -35,6 +37,7 @@ export async function fetchDistanceMatrix(points) {
             return { success: false, error: "OpenRouteService lieferte keine Distanzmatrix" }
         }
     }catch(error){
+        logError(`OpenRouteService nicht erreichbar: ${error.message}`)
         return { success: false, error: "Der Dienst OpenRouteService konnte nicht abgefragt werden", technicalFailure: true }
     }
 }

@@ -1,5 +1,6 @@
 import "dotenv/config"
 import pg from "pg"
+import { logError } from "../utils/logger.js"
 
 const { Pool } = pg
 
@@ -18,6 +19,7 @@ export async function checkConnection() {
         await pool.query("SELECT 1")
         return true
     }catch(error){
+        logError(`Datenbankverbindung fehlgeschlagen: ${error.message}`)
         return false
     }
 }

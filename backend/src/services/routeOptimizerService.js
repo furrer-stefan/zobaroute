@@ -1,4 +1,5 @@
 import { fetchDistanceMatrix } from "../adapters/routingAdapter.js"
+import { logWarn } from "../utils/logger.js"
 
 // phase 1 - clustering
 // all the coordination-points will be devided by the amount of teams, if they are spatially related and in the same areas
@@ -143,6 +144,7 @@ function balanceClusterDistribution(clusters, stops, teamCount){
             }
         }
         if (bestStopIndex === null) { // if all clusters are all maxSize
+            logWarn("Balancierung abgebrochen: kein Zielcluster mit freier Kapazität")
             break
         }
         const stopToShift = biggestCluster.splice(bestStopIndex, 1)[0] // splice command --> takes the stop at position i and removes 1 element there, [0] in order to not get the array, just the value
@@ -237,7 +239,7 @@ export async function calculateRoutes(orders, teamCount, depot) {
         if(result.success === true){
             matrix = result.matrix
         }else{
-            console.warn("ORS nicht verfügbar, Berechnung mit Luftlinie:", result.error)
+            logWarn(`ORS nicht verfügbar, Berechnung mit Luftlinie: ${result.error}`)
             matrix = buildLinearDistanceMatrix(allPoints)
         }
 

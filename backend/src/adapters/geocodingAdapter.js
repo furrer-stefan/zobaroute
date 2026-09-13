@@ -1,3 +1,5 @@
+import { logError } from "../utils/logger"
+
 export async function geocodeAddress({ street, postalCode, city }) {
     const searchParams = new URLSearchParams({
         searchText: `${street.trim()} ${postalCode.trim()} ${city.trim()}`,
@@ -20,6 +22,7 @@ export async function geocodeAddress({ street, postalCode, city }) {
             return { success: false, error: "Adresse konnte nicht gefunden werden" }
         }
     }catch(error){
+        logError(`geo.admin.ch nicht erreichbar: ${error.message}`)
         return { success: false, error: "Der Dienst geo.admin.ch konnte nicht abgefragt werden", technicalFailure: true }
     }
 }

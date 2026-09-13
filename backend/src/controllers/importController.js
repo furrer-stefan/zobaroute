@@ -3,6 +3,7 @@ import { validateOrders } from "../services/validationService.js"
 import { saveOrders } from "../repositories/orderRepository.js"
 import { parseExcelBuffer } from "../services/excelParserService.js"
 import { geocodeOrders, geocodeSingleAddress } from "../services/geocodingService.js"
+import { logError, logWarn, logInfo } from "../utils/logger.js"
 
 const geocodingProgress = {
     running: false,
@@ -20,10 +21,11 @@ export async function validateOrdersFile(req, res) {
     try{
         orders = await parseExcelBuffer(req.file.buffer)
     }catch(error){
-        console.error("Fehler beim Validieren:", error)
+        logWarn(`Import abgelehnt: ${error.message}`)
         return res.status(400).json({ message: error.message })
     }
     const validated = validateOrders(orders)
+    logInfo(`Datei eingelesen: ${validated.length} Zeilen, ${validated.filter(o => !o.isValid).length} fehlerhaft`)
     res.status(200).json({ orders: validated })
 }
 
@@ -40,10 +42,11 @@ export async function postOrders(req, res) {
     }
     try{
         await saveOrders(orders)
+        logInfo(`${orders.length} Bestellungen gespeichert`)
         res.status(200).json({ message: "Die Bestellungen wurden erfolgreich in die Datenbank eingetragen" })
     }catch(error){
-        console.error("Fehler beim Eintragen:", error)
-        res.status(500).json({ message: "Die Daten konnten nicht eingetragen werden" })
+        logError(`Speichern der Bestellungen fehlgeschlagen: ${error.message}`)
+        res.status(500).json({ message: "Speichern der Bestellungen fehlgeschlagen" })
     }
 }
 
@@ -53,8 +56,8 @@ export async function getOrders(req, res) {
         const result = await getAllOrders()
         res.status(200).json({ orders: result })
     }catch(error){
-        console.error("Fehler beim Auslesen:", error)
-        res.status(500).json({ message: "Die Daten konnten nicht ausgelesen werden" })
+        logError(`Bestellungen konnten nicht geladen werden: ${error.message}`)
+        res.status(500).json({ message: "Bestellungen konnten nicht geladen werden" })
     }
 }
 
@@ -70,8 +73,9 @@ async function runGeocoding(orders ){
             geocodingProgress.total = total
         })
         await updateGeocodingResults(geocoded)
+        logInfo(`Geokodierung beendet: ${geocoded.filter(o => o.geocodingStatus === "successful").length} erfolgreich, ${geocoded.filter(o => o.geocodingStatus === "failed").length} fehlgeschlagen`)
     }catch(error){
-        console.error("Fehler beim Geokodieren:", error)
+        logError(`Geokodierung abgebrochen: ${error.message}`)
         geocodingProgress.error = "Die Geokodierung konnte nicht abgeschlossen werden"
     }finally{
         geocodingProgress.running = false
@@ -87,7 +91,7 @@ export async function startGeocoding(req, res) {
     try{
         orders = await getOrdersForGeocoding()
     }catch(error){
-        console.error("Fehler beim Geokodieren:", error)
+        logError(`Bestellungen für Geokodierung konnten nicht geladen werden: ${error.message}`)
         return res.status(500).json({ message: "Die Geokodierung konnte nicht durchgeführt werden" })
     }
     if(orders.length === 0){
@@ -98,6 +102,7 @@ export async function startGeocoding(req, res) {
     geocodingProgress.total = orders.length
     geocodingProgress.error = null
     runGeocoding(orders)
+    logInfo(`Geokodierung gestartet für ${orders.length} Adressen`)
     res.status(202).json({ message: "Geokodierung gestartet", total: orders.length })
 }
 
@@ -115,7 +120,7 @@ export async function geocodeSingle(req, res) {
         return res.status(404).json({ message: result.error })
             
     }catch(error){
-        console.error("Fehler beim Verarbeiten:", error)
+        logError(`Einzeladresse konnte nicht verarbeitet werden: ${error.message}`)
         res.status(500).json({ message: "Die Adresse konnte nicht verarbeitet werden" })
     }
 }

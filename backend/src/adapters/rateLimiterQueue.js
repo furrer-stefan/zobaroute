@@ -1,3 +1,5 @@
+import { logError } from "../utils/logger.js"
+
 function delay(milliseconds){
     return new Promise(function(resolve){
         setTimeout(resolve, milliseconds)
@@ -11,6 +13,7 @@ export async function processQueue(tasks, delayMs, onProgress){
         try{
             result = await tasks[i]()
         }catch(error){
+            logError(`Aufgabe ${i + 1} von ${tasks.length} fehlgeschlagen: ${error.message}`)
             result = { success: false, error: "Die Aufgabe konnte nicht ausgeführt werden" }
         }
         results.push(result)

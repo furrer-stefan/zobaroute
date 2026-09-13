@@ -3,6 +3,7 @@ import { buildPdf } from "../exporters/pdfExporter.js"
 import { getAllOrders } from "../repositories/orderRepository.js"
 import { getAllRoutes, getRouteById, saveRoutes } from "../repositories/routeRepository.js"
 import { calculateRoutes } from "../services/routeOptimizerService.js"
+import { logError, logWarn, logInfo } from "../utils/logger.js"
 
 // POST /api/routes/calculate
 export async function startCalculation(req, res) {
@@ -40,15 +41,17 @@ export async function startCalculation(req, res) {
         
         const minTeamCount = Math.ceil(geocoded.length / 59) // reason for 59: ORS matrix allows 3500 matrix-fields per request (so 59x59 matrix). So a route can have a maximum of 59 stopps, thus a certain teamCount is needed.
         if(teamCount < minTeamCount){
+            logWarn(`Berechnung abgelehnt: ${teamCount} Teams, mindestens ${minTeamCount} nötig`)
             return res.status(400).json({ message: `Bei ${geocoded.length} Bestellungen sind mindestens ${minTeamCount} Teams nötig` })
         }
 
         const routes = await calculateRoutes(geocoded, teamCount, depot)
         await saveRoutes(routes)
         const fullRoutes = await getAllRoutes()
+        logInfo(`Routen berechnet: ${fullRoutes.length} Teams für ${geocoded.length} Bestellungen`)
         return res.status(200).json({ routes: fullRoutes })
     }catch(error){
-        console.error("Fehler beim Berechnen:", error)
+        logError(`Routenberechnung fehlgeschlagen: ${error.message}`)
         res.status(500).json({ message: "Die Berechnung konnte nicht durchgeführt werden" })
     }
 }
@@ -59,7 +62,7 @@ export async function getRoutes(req, res) {
         const result = await getAllRoutes()
         res.status(200).json({ routes: result })
     }catch(error){
-        console.error("Fehler beim Auslesen:", error)
+        logError(`Routen konnten nicht geladen werden: ${error.message}`)
         res.status(500).json({ message: "Die Daten konnten nicht ausgelesen werden" })
     }
 }
@@ -80,7 +83,7 @@ export async function getGpxFromRoute(req, res) {
         res.setHeader("Content-Disposition", `attachment; filename="team-${route.teamNumber}.gpx"`)
         res.send(gpxContent)
     }catch(error){
-        console.error("Fehler beim Erstellen der GPX Datei:", error)
+        logError(`GPX-Erstellung fehlgeschlagen: ${error.message}`)
         return res.status(500).json({ message: "Die GPX Datei konnte nicht erstellt werden" })
     }
 }
@@ -101,7 +104,7 @@ export async function getPdfFromRoute(req, res) {
         res.setHeader("Content-Disposition", `attachment; filename="team-${route.teamNumber}.pdf"`)
         res.send(pdfContent)
     }catch(error){
-        console.error("Fehler beim Erstellen der PDF Datei:", error)
+        logError(`PDF-Erstellung fehlgeschlagen: ${error.message}`)
         return res.status(500).json({ message: "Die PDF Datei konnte nicht erstellt werden" })
     }
 }
