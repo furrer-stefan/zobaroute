@@ -1,4 +1,4 @@
-import { logError } from "../utils/logger"
+import { logError } from "../utils/logger.js"
 
 export async function geocodeAddress({ street, postalCode, city }) {
     const searchParams = new URLSearchParams({
