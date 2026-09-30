@@ -3,7 +3,7 @@ async function handleResponse(response) {
     try{
         data = await response.json()
     }catch(error){
-        throw new Error(`Server antwortete mit Status ${response.status}`)
+            throw new Error(`Server antwortete mit Status ${response.status}`, { cause: error })
     }
 
     if(!response.ok){

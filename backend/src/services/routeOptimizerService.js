@@ -1,18 +1,6 @@
 import { fetchDistanceMatrix } from "../adapters/routingAdapter.js"
 import { logWarn } from "../utils/logger.js"
 
-// phase 1 - clustering
-// all the coordination-points will be devided by the amount of teams, if they are spatially related and in the same areas
-// procedure: k means clustering
-
-// notes:
-// a "centroid" is a center of a cluster
-// datapoints will always belong to the cluster, that has the nearest centroid
-// in a next step, there are areas created and a new middlepoint/centroid for these areas are defined by the mean:
-// every x and y difference of datapoint and centroid is listed in a column and the mean average will be taken from it
-// the calculation of the neares centroid per datapoint will be done one more time
-// this will be repeated a few times, until it doesn't get more exact
-
 const METERS_PER_DEGREE  = 111320
 const MAX_ROUNDS = 100
 const SIZE_TOLERANCE = 0.1
@@ -34,7 +22,7 @@ function calculateCentroid(stops) {
         return null
     }
     
-    // calculate median averages for all latitudes and longitudes of all stops
+    // calculate mean averages for all latitudes and longitudes of all stops
     let sumLat = 0
     let sumLon = 0
     for (const stop of stops){
@@ -49,7 +37,7 @@ function calculateCentroid(stops) {
 
 function clusterStops(stops, teamCount) {
     // this function returns an array of arrays: per team a list of stops (so all centroid clusters)
-    // definining centroids
+    // defining centroids
     const centroids = []    
     for(let i = 0; i < teamCount; i++){
         const index = Math.floor(i * stops.length / teamCount) // Math.floor always rounds the result down, length of stops will be divided by amount of teams and multiplied with current index (for 200 stops it is: 0, 50, 100, 150)
@@ -93,11 +81,6 @@ function clusterStops(stops, teamCount) {
     }
     return clusters
 }
-
-// phase 2 - balancing the different clusters, so that every cluster has more or less the same amount of stops
-// step 1: caluclating the size of one route with a variable tolerance (e.g. 10%)
-// step 2: as long as a cluster is to big, stops will be moved to another cluster
-// step 3: stop the automation, as soon as all clusters are in the accepted tolerance
 
 function balanceClusterDistribution(clusters, stops, teamCount){
     const targetSize = stops.length / teamCount
@@ -208,7 +191,7 @@ function improveRoute2opt(route, matrix) {
 
     while(improved){
         improved = false
-        for (let i = 1; i < shortestRoute.length - 1 && !improved; i++) { // i = 1, weil das Depot nicht geprüft werden soll, das ist klar, dass es auf der Route am Anfang sein soll
+        for (let i = 1; i < shortestRoute.length - 1 && !improved; i++) { // // i = 1: the depot stays at position 0 and must not be moved
             for (let j = i + 1; j < shortestRoute.length; j++) {
                 const firstPart = shortestRoute.slice(0, i) // takes the first part, from 0 until the current value of for loop. in slice, the second value will be the first one, to not be included
                 const flipPart = shortestRoute.slice(i, j + 1).reverse() // takes the middle part and flips it
@@ -246,7 +229,7 @@ export async function calculateRoutes(orders, teamCount, depot) {
         const nearestNeighborRoute = orderStopsNearestNeighbor(matrix, 0)
         const improvedRoute = improveRoute2opt(nearestNeighborRoute, matrix)
         const improvedStops = []
-        for(let j = 1; j < improvedRoute.length; j++){ // j = 1, weil das Depot nicht mit dazu genommen werden soll
+        for(let j = 1; j < improvedRoute.length; j++){ // j = 1: skip the depot, it does not belong in the stop list
             let distance = null
             if(j > 1){
                 distance = matrix[improvedRoute[j - 1]][improvedRoute[j]]
